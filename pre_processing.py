@@ -51,18 +51,17 @@ def extract_triple(data_dir, output_path):
 
 def extract_user_item(output_path):
     df = pd.read_csv('%s/MenUI.csv' % output_path)
-    print(df.head())
     u_df = df['reviewerID'].copy().drop_duplicates()
-    print(len(u_df))
     u_df.to_csv('%s/user.csv' % output_path, index=False)
     i_df = df['asin'].copy().drop_duplicates()
-    print(len(i_df))
     i_df.to_csv('.%/item.csv' % output_path, index=False)
+    print(df.head())
+    print(len(u_df))
+    print(len(i_df))
 
 
 def test():
     print(np.random.permutation(10))
-
     d = {}
     d.setdefault('a', 1)
     print(d['a'])
@@ -71,6 +70,7 @@ def test():
 
 
 if __name__ == '__main__':
-    extract_triple('/Users/maxuedong/Desktop/BJTU/推荐系统/dataset/AmazonFashionWithImgPartitioned_train.npy',
-                   './data/fashion')
+    # extract_triple('/Users/maxuedong/Desktop/BJTU/推荐系统/dataset/AmazonFashionWithImgPartitioned_train.npy',
+    #                './data/fashion')
+    extract_user_item('./data/fashion')
 
