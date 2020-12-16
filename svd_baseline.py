@@ -5,14 +5,15 @@ from numpy.random import random
 
 
 class SVD:
-    def __init__(self, X, k=20):
+    def __init__(self, X, ave, k=20):
         """
             X  is the input triple list
             k  is the length of vector
         """
         self.X = np.array(X)
         self.k = k
-        self.ave = np.mean(self.X[:, 2])
+        # self.ave = np.mean(self.X[:, 2])
+        self.ave = ave
         self.bi = {}
         self.bu = {}
         self.qi = {}

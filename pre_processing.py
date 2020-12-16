@@ -32,9 +32,11 @@ def extract_triple(data_dir, output_path):
     print(os.path.exists(output_path))
     train_dataset = np.load(data_dir, allow_pickle=True, encoding='bytes')
     [user_train, item, n_users, n_items] = train_dataset
-
-    # AmazonMen 34244 110636 交互物品为 89649
-    # Fashion   45184 166270
+    # AmazonMen         34244 110636
+    #                   34244 89649
+    # AmazonFashion     45184 166270
+    #                   45184 137755
+    #                 总交互频次267635
     print('用户数： ', n_users)
     print('商品数: ', n_items)
     print("第一个user数据: ", user_train[0])
@@ -46,31 +48,55 @@ def extract_triple(data_dir, output_path):
         for ur in reviews:
             records.append([ur.get('reviewerID'), ur.get('asin'), ur.get('overall')])
     df = pd.DataFrame(records, columns=['reviewerID', 'asin', 'overall'])
-    df.to_csv('%s./MenUI.csv' % output_path, index=False)
+    df.to_csv('%s/UIMatrix.csv' % output_path, index=False)
+
+
+def extract_user(data_dir, output_path):
+    train_dataset = np.load(data_dir, allow_pickle=True, encoding='bytes')
+    [user_train, item, n_users, n_items] = train_dataset
+    user_codes = []
+    for u in range(len(user_train)):
+        line = []
+        user_code = user_train[u][0]['reviewerID']
+        line.append(user_code)
+        user_codes.append(line)
+    pd.DataFrame(user_codes, columns=['user_code']).to_csv('%s/user_code.csv' % output_path)
+
+
+def extract_item(data_dir, output_path):
+    train_dataset = np.load(data_dir, allow_pickle=True, encoding='bytes')
+    [user_train, item, n_users, n_items] = train_dataset
+    item_codes = []
+    for i in range(len(item)):
+        line = []
+        item_code = item[i].get(b'asin').decode('utf-8')
+        line.append(item_code)
+        item_codes.append(line)
+    pd.DataFrame(item_codes, columns=['item_code']).to_csv('%s/item_code.csv' % output_path)
 
 
 def extract_user_item(output_path):
-    df = pd.read_csv('%s/MenUI.csv' % output_path)
+    df = pd.read_csv('%s/UIMatrix.csv' % output_path)
     u_df = df['reviewerID'].copy().drop_duplicates()
     u_df.to_csv('%s/user.csv' % output_path, index=False)
     i_df = df['asin'].copy().drop_duplicates()
     i_df.to_csv('.%/item.csv' % output_path, index=False)
-    print(df.head())
-    print(len(u_df))
-    print(len(i_df))
-
-
-def test():
-    print(np.random.permutation(10))
-    d = {}
-    d.setdefault('a', 1)
-    print(d['a'])
-    d['a'] = 2
-    print(d)
 
 
 if __name__ == '__main__':
-    # extract_triple('/Users/maxuedong/Desktop/BJTU/推荐系统/dataset/AmazonFashionWithImgPartitioned_train.npy',
-    #                './data/fashion')
-    extract_user_item('./data/fashion')
+    data_dir = './data/AmazonFashionWithImgPartitioned_train.npy'
+    output_path = './data/fashion'
+    extract_triple(data_dir, output_path)
+    extract_user(data_dir, output_path)
+    extract_item(data_dir, output_path)
 
+    # user_code = pd.read_csv('./data/fashion/user_code.csv')
+    # item_code = pd.read_csv('./data/fashion/item_code.csv')
+    # print(user_code.loc[0][1])
+    # print(item_code.loc[0][1])
+
+    # ui = pd.read_csv('./data/fashion/UIMatrix.csv')
+    # print(ui['reviewerID'].drop_duplicates().count())
+    # print(ui['asin'].drop_duplicates().count())
+
+    print('hello')
